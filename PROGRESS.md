@@ -136,6 +136,19 @@ would write 3 entries (18.5 KB)
 - 约定已写进 `F:\Dev\dsh-mod\README.md`（新节 “Publishing a package publicly”：GitHub `topic:dsh-plugin` + `deepseek-harness`、npm `keywords:dsh-plugin`，并说明官方市场走索引 JSON 而非 topic）。
 - 账号下的公开 DSH 仓库补齐 topic：`dsh-pwsh-cp` 新加，`dsh-dump-manager`/`dsh-llm-dump` 原本已有；`dsh-desktop-gateway` 是 private，按用户要求跳过。无关的公开仓库（llama.cpp、agy-run 等）不加，避免污染 topic 流。
 
+### 阶段十 — npm 首发（受阻：2FA）
+
+- 四个公开包都通过了预检：`npm whoami` = `wannaknowhys`；`dsh-llm-dump`、`dsh-dump-manager` 的测试全绿；三个伴生包补了 `keywords`（含 `dsh-plugin`）与 `engines` 并推送。
+- `npm publish` 返回 **EOTP**：账号开了发布用 2FA，非交互 shell 无法输入一次性密码。
+- 待用户在本机交互式执行（每条会提示 OTP）：
+
+```powershell
+cd F:\Dev\dsh-mod\packages\dsh-preset-rules; npm publish
+cd ..\pwsh-cp;      npm publish
+cd ..\llm-dump;     npm publish
+cd ..\dump-manager; npm publish
+```
+
 ## 二、与 DESIGN 的偏离
 
 | # | 阶段 | DESIGN | 实际 | 原因 |
