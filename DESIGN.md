@@ -504,6 +504,7 @@ dsh-preset-rules/
 | 22 | 规则从哪来 | 插件不写规则、不带内置默认规则；首次启动打一行 info + CLI `--init` 生成模板 |
 | 23 | 仓库地址 | 用户确认即 `wannaknowhys/dsh-preset-rules` |
 | 24 | 首次运行交互 | v0.1 只做 info + `--init`；「空白 / 复制去 time-context 模板 / 取消」的三选对话框放 0.2（需要 client 半与宿主 RPC） |
+| 25 | 换行符 | `.gitattributes` 固定 `* text=auto eol=lf`，索引与工作区都是 LF |
 
 ---
 
