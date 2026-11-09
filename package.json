@@ -1,0 +1,55 @@
+{
+  "name": "dsh-preset-rules",
+  "version": "0.1.0",
+  "description": "Generate DeepSeek Harness agent-preset patches from a small editable rule file.",
+  "license": "MIT",
+  "author": "wannaknowhys",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wannaknowhys/dsh-preset-rules.git"
+  },
+  "homepage": "https://github.com/wannaknowhys/dsh-preset-rules#readme",
+  "bugs": {
+    "url": "https://github.com/wannaknowhys/dsh-preset-rules/issues"
+  },
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "preset-rules": "./bin/preset-rules.js"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "bin",
+    "src",
+    "cordis.patch.yml",
+    "examples",
+    "README.md",
+    "README.zh.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "agent-preset",
+    "cordis",
+    "plugin"
+  ]
+}

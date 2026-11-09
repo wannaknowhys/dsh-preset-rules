@@ -1,0 +1,25 @@
+# Example rule file for dsh-preset-rules.
+# Copy to  $DSH_HOME/preset-rules.rules  and edit.
+#
+# One rule per line, three named clauses separated by ';':
+#   presets = <set>; entry = <selector>; action = <action>()
+#
+# A rule applies the action to every row matching `entry` in every preset
+# matching `presets` (a cross product). Rules apply top to bottom.
+
+# Hide the per-step time sampling from every shipped preset.
+presets = all; entry = id: time-context; action = hide()
+
+# More examples:
+
+# Only outside the minimal preset.
+# presets = not(minimal); entry = id: tool-todo; action = hide()
+
+# Two presets only.
+# presets = {standard, cordis}; entry = id: time-context; action = hide()
+
+# Everything except the shell tools.
+# presets = all; entry = not(id: {tool-bash, tool-pwsh}); action = hide()
+
+# Reserved actions parse today but stop with "not supported in 0.1":
+# presets = not(minimal); entry = id: agent-instructions; action = set(config.maxBytes, 512)

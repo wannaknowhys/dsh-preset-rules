@@ -1,0 +1,10 @@
+# dsh-preset-rules bundle layer.
+#
+# Inserts the generator row. On every start the plugin recomputes
+# $DSH_HOME/cordis.patch.yml from the shipped presets and the rule file;
+# this file only declares the plugin itself and is never generated.
+- insert:
+    - id: preset-rules
+      name: dsh-preset-rules
+      config:
+        mode: apply

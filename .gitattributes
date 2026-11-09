@@ -1,0 +1,3 @@
+# Keep line endings identical on every platform: LF in the repository and in
+# the working tree.
+* text=auto eol=lf
