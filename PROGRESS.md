@@ -133,6 +133,8 @@ would write 3 entries (18.5 KB)
 - npm `keywords` 增加 `dsh-plugin`；`prepublishOnly` 挂上测试，发布前自动跑 79 个用例。
 - npm 包名 `dsh-preset-rules` 目前 **未被占用**（`npm view` 404）。
 - 尚未发布到 npm（需要用户本机 `npm login` + 2FA）。`npm publish --dry-run` 已通过：15 个文件、19.1 kB，`prepublishOnly` 会先跑测试。
+- 约定已写进 `F:\Dev\dsh-mod\README.md`（新节 “Publishing a package publicly”：GitHub `topic:dsh-plugin` + `deepseek-harness`、npm `keywords:dsh-plugin`，并说明官方市场走索引 JSON 而非 topic）。
+- 账号下的公开 DSH 仓库补齐 topic：`dsh-pwsh-cp` 新加，`dsh-dump-manager`/`dsh-llm-dump` 原本已有；`dsh-desktop-gateway` 是 private，按用户要求跳过。无关的公开仓库（llama.cpp、agy-run 等）不加，避免污染 topic 流。
 
 ## 二、与 DESIGN 的偏离
 
