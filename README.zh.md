@@ -18,7 +18,13 @@
 ## 安装
 
 ```sh
-dsh plugin --profile <profile> add <本包>
+dsh plugin --profile desktop add dsh-preset-rules
+```
+
+从源码装：
+
+```sh
+dsh plugin --profile desktop add github:wannaknowhys/dsh-preset-rules
 ```
 
 或者在 Harness 界面里用插件管理器安装（Creator 模式写的是同一份 bundle patch）。

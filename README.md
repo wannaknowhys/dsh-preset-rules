@@ -18,7 +18,13 @@ An override written by hand goes stale: when dsh ships a new preset row, a froze
 ## Install
 
 ```sh
-dsh plugin --profile <profile> add <this-package>
+dsh plugin --profile desktop add dsh-preset-rules
+```
+
+From a checkout instead of npm:
+
+```sh
+dsh plugin --profile desktop add github:wannaknowhys/dsh-preset-rules
 ```
 
 Or install it from the Harness UI with the plugin manager (Creator mode writes the same bundle patch).
