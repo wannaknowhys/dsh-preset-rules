@@ -6,7 +6,8 @@
 | 版本 | 0.1.0（未发布） |
 | 阶段 | 一~七完成：解析/求值、上游读取/渲染、编排/落盘、插件入口+CLI+文档、装进 profile、首次安装体验、git 初始化 |
 | 测试 | `node --test test/` → 79 pass / 0 fail（~1.5 s，含 7 个 CLI 子进程用例） |
-| 版本库 | `main` 分支，28 个文件；已推送到 https://github.com/wannaknowhys/dsh-preset-rules（public），tag `v0.1.0` |
+| 版本库 | https://github.com/wannaknowhys/dsh-preset-rules（public，`main` = `79d8714`，tag `v0.1.0` 指向同一提交） |
+| 生态发现 | 仓库 topics：`dsh-plugin`、`deepseek-harness`、`dsh`、`cordis`；npm `keywords` 含 `dsh-plugin` |
 | 真机验证 | **端到端通过**：用户重启后确认预设里已无 `Time sampled` |
 | 偏差 | 11 处，见第二节 |
 
@@ -121,8 +122,17 @@ would write 3 entries (18.5 KB)
 ### 阶段八 — 发布
 
 - `gh repo create wannaknowhys/dsh-preset-rules --public --source . --push` → 仓库建立并推送（`main` 跟踪 `origin/main`）。
-- 打注释 tag `v0.1.0` 并推送。
+- 打注释 tag `v0.1.0` 并推送；后按用户要求把 tag 移到最新提交（删除远端 tag 再重推，仓库刚建、无副作用）。
 - 仓库：https://github.com/wannaknowhys/dsh-preset-rules（public，默认分支 `main`）。
+
+### 阶段九 — 生态发现
+
+社区索引（dshbase、dsh-plugins-store、dsh-plugin-marketplace 等）靠 GitHub topic 抓取；官方 `pluginMarket` 读的是**用户配置的索引 JSON**（`dsh-plugin-market-index` 校验），不看 topic。两条路都做最划算：
+
+- GitHub topics：`dsh-plugin`、`deepseek-harness`、`dsh`、`cordis`（`gh repo edit --add-topic`）。
+- npm `keywords` 增加 `dsh-plugin`；`prepublishOnly` 挂上测试，发布前自动跑 79 个用例。
+- npm 包名 `dsh-preset-rules` 目前 **未被占用**（`npm view` 404）。
+- 尚未发布到 npm（需要用户本机 `npm login` + 2FA）。
 
 ## 二、与 DESIGN 的偏离
 
@@ -153,11 +163,12 @@ DESIGN 已同步：§7.2 日志策略表、§8 仓库树、§10 发布清单、�
 
 ## 四、待你确认
 
-1. **首次运行对话框**：认可放到 0.2 吗？（v0.1 保留 info + `--init`）如果要现在做，我需要补 client 半、宿主 RPC 和浏览器验证，工期另算。
+1. **要不要发 npm？** 名字可用、内容已 `npm pack` 验证；实际 `npm publish` 需要你本机 `npm login`（2FA），我这边没有凭据。
+2. **首次运行对话框**已确认排到 0.2。
 
 ## 五、下一步
 
 | 步 | 内容 |
 |---|---|
-| 8 | （0.2）`set()`/`disable()`、正则选择器、规则文件热更新、首次运行对话框 |
-| 9 | （0.2）`disable/enable` 需要先确认「整行 disabled」与「隐藏」在 dsh 里的语义差异 |
+| 9 | （可选）`npm publish` 首发，之后 `dsh plugin add dsh-preset-rules` 即可安装 |
+| 10 | （0.2）`set()`/`disable()`、正则选择器、规则热更新、首次运行对话框 |

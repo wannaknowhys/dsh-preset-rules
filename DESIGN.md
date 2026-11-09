@@ -505,6 +505,8 @@ dsh-preset-rules/
 | 23 | 仓库地址 | 用户确认即 `wannaknowhys/dsh-preset-rules` |
 | 24 | 首次运行交互 | v0.1 只做 info + `--init`；「空白 / 复制去 time-context 模板 / 取消」的三选对话框放 0.2（需要 client 半与宿主 RPC） |
 | 25 | 换行符 | `.gitattributes` 固定 `* text=auto eol=lf`，索引与工作区都是 LF |
+| 26 | 生态发现 | GitHub topics `dsh-plugin` / `deepseek-harness` / `dsh` / `cordis` + npm `keywords: dsh-plugin`；官方市场走索引 JSON，不是 topic |
+| 27 | npm 发布 | 包名已验证可用；发布由用户本机 `npm login` 完成（`prepublishOnly` 会先跑测试） |
 
 ---
 
