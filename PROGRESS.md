@@ -149,6 +149,18 @@ cd ..\llm-dump;     npm publish
 cd ..\dump-manager; npm publish
 ```
 
+### 阶段十一 — 伴生包 0.1.1（发布被 npm 策略挡住）
+
+- 用户已发布四个 0.1.0（`npm view` 四个包都已是 0.1.0）。
+- 三个伴生包的 README（中英）补了 npm 安装方式，版本升到 **0.1.1**，已 commit + push：
+  - `dsh-pwsh-cp` → `72b97d0`
+  - `dsh-llm-dump` → `57d7952`
+  - `dsh-dump-manager` → `dbc599c`
+- 发布 0.1.1 被拒：`403 ... Two-factor authentication or granular access token with bypass 2fa enabled is required to publish packages.`
+  - `npm profile get` 显示 `two-factor auth: disabled`——用户关掉 2FA 后，npm 的新发布策略正好要求 2FA（或带 bypass 的 granular token）。
+  - 解法二选一：重新开启 2FA（`Auth and writes`）后用 OTP 发布；或在 npm 后台建 granular token（勾选 Bypass 2FA、对这三个包 write）写进 `.npmrc`。
+- 源码侧已全部就绪，只差 npm 上的 0.1.1。
+
 ## 二、与 DESIGN 的偏离
 
 | # | 阶段 | DESIGN | 实际 | 原因 |
