@@ -6,7 +6,7 @@
 | 版本 | 0.1.0（未发布） |
 | 阶段 | 一~七完成：解析/求值、上游读取/渲染、编排/落盘、插件入口+CLI+文档、装进 profile、首次安装体验、git 初始化 |
 | 测试 | `node --test test/` → 79 pass / 0 fail（~1.5 s，含 7 个 CLI 子进程用例） |
-| 版本库 | `main` 分支，首个提交 `89639d2`，28 个文件，`node_modules/` 已排除 |
+| 版本库 | `main` 分支，28 个文件；已推送到 https://github.com/wannaknowhys/dsh-preset-rules（public），tag `v0.1.0` |
 | 真机验证 | **端到端通过**：用户重启后确认预设里已无 `Time sampled` |
 | 偏差 | 11 处，见第二节 |
 
@@ -118,6 +118,12 @@ would write 3 entries (18.5 KB)
 - 28 个文件入库；`node_modules/`、`*.tmp-*` 被 `.gitignore` 排除；没有 `.tgz` 或生成物混入。
 - 新增 `.gitattributes`：`* text=auto eol=lf`。本机 `core.autocrlf=true` 会告警「下次触碰转 CRLF」，加了这个之后索引与工作区都是 LF（`git ls-files --eol` 已验证），跨平台一致。
 
+### 阶段八 — 发布
+
+- `gh repo create wannaknowhys/dsh-preset-rules --public --source . --push` → 仓库建立并推送（`main` 跟踪 `origin/main`）。
+- 打注释 tag `v0.1.0` 并推送。
+- 仓库：https://github.com/wannaknowhys/dsh-preset-rules（public，默认分支 `main`）。
+
 ## 二、与 DESIGN 的偏离
 
 | # | 阶段 | DESIGN | 实际 | 原因 |
@@ -148,11 +154,10 @@ DESIGN 已同步：§7.2 日志策略表、§8 仓库树、§10 发布清单、�
 ## 四、待你确认
 
 1. **首次运行对话框**：认可放到 0.2 吗？（v0.1 保留 info + `--init`）如果要现在做，我需要补 client 半、宿主 RPC 和浏览器验证，工期另算。
-2. **push**：仓库建好后把 remote 地址给我，或者你自己 `git remote add origin … && git push -u origin main`。
 
 ## 五、下一步
 
 | 步 | 内容 |
 |---|---|
-| 7 | 建 GitHub 仓库 → `git remote add` → `push -u origin main` |
-| 8 | （可选）0.2：`set()`/`disable()`、正则选择器、首次运行对话框 |
+| 8 | （0.2）`set()`/`disable()`、正则选择器、规则文件热更新、首次运行对话框 |
+| 9 | （0.2）`disable/enable` 需要先确认「整行 disabled」与「隐藏」在 dsh 里的语义差异 |
