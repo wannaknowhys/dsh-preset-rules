@@ -132,7 +132,7 @@ would write 3 entries (18.5 KB)
 - GitHub topics：`dsh-plugin`、`deepseek-harness`、`dsh`、`cordis`（`gh repo edit --add-topic`）。
 - npm `keywords` 增加 `dsh-plugin`；`prepublishOnly` 挂上测试，发布前自动跑 79 个用例。
 - npm 包名 `dsh-preset-rules` 目前 **未被占用**（`npm view` 404）。
-- 尚未发布到 npm（需要用户本机 `npm login` + 2FA）。
+- 尚未发布到 npm（需要用户本机 `npm login` + 2FA）。`npm publish --dry-run` 已通过：15 个文件、19.1 kB，`prepublishOnly` 会先跑测试。
 
 ## 二、与 DESIGN 的偏离
 
