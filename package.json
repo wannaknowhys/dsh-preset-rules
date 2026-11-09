@@ -43,10 +43,12 @@
     "js-yaml": "^4.1.0"
   },
   "scripts": {
-    "test": "node --test test/"
+    "test": "node --test test/",
+    "prepublishOnly": "node --test test/"
   },
   "keywords": [
     "dsh",
+    "dsh-plugin",
     "deepseek-harness",
     "agent-preset",
     "cordis",
