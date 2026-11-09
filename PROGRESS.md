@@ -4,8 +4,9 @@
 |---|---|
 | 更新 | 2026-11-09 |
 | 版本 | 0.1.0（未发布） |
-| 阶段 | 一~六完成：解析/求值、上游读取/渲染、编排/落盘、插件入口+CLI+文档、装进 profile、首次安装体验 |
+| 阶段 | 一~七完成：解析/求值、上游读取/渲染、编排/落盘、插件入口+CLI+文档、装进 profile、首次安装体验、git 初始化 |
 | 测试 | `node --test test/` → 79 pass / 0 fail（~1.5 s，含 7 个 CLI 子进程用例） |
+| 版本库 | `main` 分支，首个提交 `89639d2`，28 个文件，`node_modules/` 已排除 |
 | 真机验证 | **端到端通过**：用户重启后确认预设里已无 `Time sampled` |
 | 偏差 | 11 处，见第二节 |
 
@@ -111,6 +112,12 @@ would write 3 entries (18.5 KB)
 | 首次启动复制模板 | 用户删掉模板后，只要生成物也不存在就会被重建，同样破坏语义 |
 | info + `--init`（采用） | 显式、无副作用；提示只在真正空白时出现，创建文件由用户触发 |
 
+### 阶段七 — git 初始化
+
+- `git init -b main`；首提交 `89639d2`（随后用 `.gitattributes` 重整为 LF，amend 后仍是同一个提交历史）。
+- 28 个文件入库；`node_modules/`、`*.tmp-*` 被 `.gitignore` 排除；没有 `.tgz` 或生成物混入。
+- 新增 `.gitattributes`：`* text=auto eol=lf`。本机 `core.autocrlf=true` 会告警「下次触碰转 CRLF」，加了这个之后索引与工作区都是 LF（`git ls-files --eol` 已验证），跨平台一致。
+
 ## 二、与 DESIGN 的偏离
 
 | # | 阶段 | DESIGN | 实际 | 原因 |
@@ -140,12 +147,12 @@ DESIGN 已同步：§7.2 日志策略表、§8 仓库树、§10 发布清单、�
 
 ## 四、待你确认
 
-1. **仓库地址**：已按 `wannaknowhys/dsh-preset-rules` 定稿（决策 23），建仓库时按这个名字建即可。
-2. **要不要自动创建规则文件？** 目前的结论是不自动（理由见下），只给 info + `--init`。如果你更想要「装上就有规则」，告诉我要哪一种形态（内置默认规则 / 首次启动复制模板），我再做。
+1. **首次运行对话框**：认可放到 0.2 吗？（v0.1 保留 info + `--init`）如果要现在做，我需要补 client 半、宿主 RPC 和浏览器验证，工期另算。
+2. **push**：仓库建好后把 remote 地址给我，或者你自己 `git remote add origin … && git push -u origin main`。
 
 ## 五、下一步
 
 | 步 | 内容 |
 |---|---|
-| 6 | `git init` + 首次提交（含 `.gitignore` 生效检查） |
-| 7 | 建 GitHub 仓库、push、打 tag |
+| 7 | 建 GitHub 仓库 → `git remote add` → `push -u origin main` |
+| 8 | （可选）0.2：`set()`/`disable()`、正则选择器、首次运行对话框 |
