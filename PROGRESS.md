@@ -161,6 +161,20 @@ cd ..\dump-manager; npm publish
   - 解法二选一：重新开启 2FA（`Auth and writes`）后用 OTP 发布；或在 npm 后台建 granular token（勾选 Bypass 2FA、对这三个包 write）写进 `.npmrc`。
 - 源码侧已全部就绪，只差 npm 上的 0.1.1。
 
+### 阶段十二 — 四个包全部上架
+
+`npm view` 实测：
+
+| 包 | 版本 | 发布（UTC） |
+|---|---|---|
+| dsh-preset-rules | 0.1.0 | 2026-11-09T17:00:21Z |
+| dsh-pwsh-cp | 0.1.1 | 2026-11-14T18:31:20Z |
+| dsh-llm-dump | 0.1.1 | 2026-11-14T18:31:38Z |
+| dsh-dump-manager | 0.1.1 | 2026-11-14T18:31:46Z |
+
+- 四个包的 `engines.node = >=20`、`keywords` 含 `dsh-plugin`，发布出去的 README 都包含 npm 安装行（逐个 `npm view <pkg> readme` 验证）。
+- 中途那次 `E404 PUT … Not found` 的真实原因：npm 登录态失效（`npm whoami` → `E401`），registry 对未认证的 PUT 回 404 以隐藏包是否存在。包一直在 registry 里；`npmjs.com` 对所有页面（包括 `left-pad`）都给 curl 回 403（Cloudflare），不能用它判断包是否存活。
+
 ## 二、与 DESIGN 的偏离
 
 | # | 阶段 | DESIGN | 实际 | 原因 |
