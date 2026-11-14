@@ -174,6 +174,8 @@ cd ..\dump-manager; npm publish
 
 - 四个包的 `engines.node = >=20`、`keywords` 含 `dsh-plugin`，发布出去的 README 都包含 npm 安装行（逐个 `npm view <pkg> readme` 验证）。
 - 中途那次 `E404 PUT … Not found` 的真实原因：npm 登录态失效（`npm whoami` → `E401`），registry 对未认证的 PUT 回 404 以隐藏包是否存在。包一直在 registry 里；`npmjs.com` 对所有页面（包括 `left-pad`）都给 curl 回 403（Cloudflare），不能用它判断包是否存活。
+- 四个 README（中英）加了 npm 版本 + license 徽章，shields.io 四个都返回 200；已 commit + push（`7f4c82a` / `f3a3c58` / `d5a9562` / `4f66f3a`）。npm 页面上的 README 要等下次发版才会带徽章——按用户要求暂不发。
+- `dsh-pwsh-cp` 的历史版本 `0.0.0-stage`（2026-11-09 16:59）已过 npm 的 72 小时 unpublish 窗口，无法删除；`latest` 指向 0.1.1，不影响安装。
 
 ## 二、与 DESIGN 的偏离
 
