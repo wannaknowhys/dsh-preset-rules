@@ -1,5 +1,7 @@
 # dsh-preset-rules
 
+[![npm version](https://img.shields.io/npm/v/dsh-preset-rules.svg)](https://www.npmjs.com/package/dsh-preset-rules) [![license](https://img.shields.io/npm/l/dsh-preset-rules.svg)](./LICENSE)
+
 [English](README.md) | [简体中文](README.zh.md)
 
 用一份可编辑的规则文件管理 DeepSeek Harness 的 Agent 预设——每次启动重新生成，dsh 升级后预设不会悄悄过期。

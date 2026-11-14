@@ -1,5 +1,7 @@
 # dsh-preset-rules
 
+[![npm version](https://img.shields.io/npm/v/dsh-preset-rules.svg)](https://www.npmjs.com/package/dsh-preset-rules) [![license](https://img.shields.io/npm/l/dsh-preset-rules.svg)](./LICENSE)
+
 [English](README.md) | [简体中文](README.zh.md)
 
 Keep DeepSeek Harness agent presets under a small, editable rule file — regenerated on every start, so a dsh update never leaves your presets stale.
