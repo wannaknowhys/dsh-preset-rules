@@ -1,6 +1,6 @@
 {
   "name": "dsh-preset-rules",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Generate DeepSeek Harness agent-preset patches from a small editable rule file.",
   "license": "MIT",
   "author": "wannaknowhys",

@@ -2,14 +2,14 @@
 
 | | |
 |---|---|
-| 更新 | 2026-11-09 |
-| 版本 | 0.1.0（未发布） |
-| 阶段 | 一~七完成：解析/求值、上游读取/渲染、编排/落盘、插件入口+CLI+文档、装进 profile、首次安装体验、git 初始化 |
-| 测试 | `node --test test/` → 79 pass / 0 fail（~1.5 s，含 7 个 CLI 子进程用例） |
+| 更新 | 2026-11-14 |
+| 版本 | 0.2.0（本地 `link:` 安装；npm 仍是最早的发布版） |
+| 阶段 | 0.1 全部完成；0.2.0 完成 `set()` / `disable()` / `enable()` 与嵌套 group 行，并已装进本机规则文件 |
+| 测试 | `node --test test/` → 88 pass / 0 fail（含 7 个 CLI 子进程用例） |
 | 版本库 | https://github.com/wannaknowhys/dsh-preset-rules（public，`main` = `79d8714`，tag `v0.1.0` 指向同一提交） |
 | 生态发现 | 仓库 topics：`dsh-plugin`、`deepseek-harness`、`dsh`、`cordis`；npm `keywords` 含 `dsh-plugin` |
-| 真机验证 | **端到端通过**：用户重启后确认预设里已无 `Time sampled` |
-| 偏差 | 11 处，见第二节 |
+| 真机验证 | 0.1：用户重启后确认预设里已无 `Time sampled`；0.2：本机 `--check`/`--apply` 通过，生成物四个预设均含 `compaction-basic.config.auto: false`（运行时生效待新会话观察） |
+| 偏差 | 12 处，见第二节 |
 
 ---
 
@@ -177,6 +177,21 @@ cd ..\dump-manager; npm publish
 - 四个 README（中英）加了 npm 版本 + license 徽章，shields.io 四个都返回 200；已 commit + push（`7f4c82a` / `f3a3c58` / `d5a9562` / `4f66f3a`）。npm 页面上的 README 要等下次发版才会带徽章——按用户要求暂不发。
 - `dsh-pwsh-cp` 的历史版本 `0.0.0-stage`（2026-11-09 16:59）已过 npm 的 72 小时 unpublish 窗口，无法删除；`latest` 指向 0.1.1，不影响安装。
 
+### 阶段十三 — 0.2.0：`set()` / `disable()` / `enable()`（+2 用例 → 88 通过）
+
+- `src/model.js`：`writeSet()` 写行字段——`config` 走点分路径（缺失的中间层按映射创建），`disabled` 收布尔；`config.id` / `config.plugins` 归生成器所有，规则改写时报错并带规则位置。`disable()` / `enable()` 等价于 `set(disabled, true/false)`。
+- **行匹配改为递归**：`compaction-basic` 并不在预设顶层，而是装在 `cordis:group`（`id: compaction`）的 `config` 数组里；`walkRows()` 因此遍历 group 子行，`hide()` 从所属列表就地删除，`set`/`disable`/`enable` 就地改写。
+- 变更判定改为整行深比较（否则只改 `disabled` 的规则会被当成无变更），新增 `originalCount`/`count`（递归行数）与 `applied`（每条改写的记录），报告里显示成 `~ compaction-basic.config.auto = false`。
+- `src/generate.js`：渲染回读校验新增「改写字段回读一致」「`disabled` 保持布尔」两项，行数校验改为递归计数。
+- `package.json` 0.2.0，生成物 header 版本改为从 `package.json` 读取，不再两处硬编码。
+- 真实用途：`presets = all; entry = id: compaction-basic; action = set(config.auto, false)` 一次性关掉四个预设的自动上下文压缩（行仍挂载，手动 `/compact` 照常可用）。
+
+### 阶段十四 — 装进本机规则文件（2026-11-14）
+
+- `$DSH_HOME/preset-rules.rules` 追加上述 `compaction-basic` 规则，并写明背景（默认触发点 727,040 tokens ≈ 69%，10/27–11/12 真机自动压了 5 次）。
+- `--check` → `--apply` 通过，`$DSH_HOME/cordis.patch.yml` 四个预设的 compaction group 内均有 `config: { auto: false }`。
+- **未验证**：运行中的进程是否需要重启才让新修订生效（patch watcher 会重组合，但已开始的会话保持旧修订），因此本会话仍可能自动压缩一次；下次长会话的 `compaction/start` 是否全部带 `sourceCommandId`，是这条规则是否生效的可证伪检查。
+
 ## 二、与 DESIGN 的偏离
 
 | # | 阶段 | DESIGN | 实际 | 原因 |
@@ -192,8 +207,9 @@ cd ..\dump-manager; npm publish
 | 9 | 四 | 仓库含 `docs/rules.md` | 规则参考并入 README，不设 `docs/` | 规则很少，两份文档必然漂移 |
 | 10 | 四 | 未规定日志细节 | 新增 `summarize()`，写入只打一行 | 与「安静优先」一致，避免重复格式化 |
 | 11 | 四 | `apply(ctx, config)` 为 async | 同步函数 | 全流程 < 20 ms，无需异步；loader 两者都接受 |
+| 12 | 三 | 「行」只按预设顶层条目理解 | 行匹配递归进 `cordis:group` 的 `config` 数组 | 不改就寻址不到 `compaction-basic` / `tool-subagent` 这类嵌套行；报告计数同步改为递归 |
 
-DESIGN 已同步：§7.2 日志策略表、§8 仓库树、§10 发布清单、§11 决策 17–19。
+DESIGN 已同步：§3.5 动作表、§3.6 文法标题、§3.7 错误项、§3.8 示例、§7.2 日志策略表、§8 仓库树、§10 发布清单、§11 决策 6 与 17–19、§12 路线图。
 
 ## 三、实现中的发现
 
@@ -203,6 +219,8 @@ DESIGN 已同步：§7.2 日志策略表、§8 仓库树、§10 发布清单、�
 - 包体积 18.3 kB（压缩）/ 56.9 kB（解压），15 个文件——对一个「只做配置生成」的 bundle 来说合理。
 - **安装后第一次启动是静默 no-op**：没有规则文件时设计上就是「无条目、不建文件」，所以用户装完看不到任何反应。这符合「安静优先」，但对首次安装的人容易误判成「没生效」。可考虑：规则文件缺失时打一行 info（见待确认 3）。
 - 桌面 profile 被 Electron 独占，`dsh --profile desktop --dump-config` 会拒绝（`profile "desktop" is managed exclusively by the Electron application`），所以组合结果没法用 CLI 离线复检——只能靠生成物本身与 patch 语义推断。
+- **预设行是两层结构**：`compaction`、`delegation`、`persistent-shell` 这些 `cordis:group` 行把真正的插件放在自己的 `config` 数组里，顶层 `plugins` 里只有 group 本身。`entry = id: compaction-basic` 一开始零匹配、只出一条 warning，就是这个原因；改成递归遍历后 4 个预设全部命中。
+- 真实安装上跑 `--check` 的输出（Electron-as-node，含嵌套行计数）：`standard 32 -> 31`、`ptc 33 -> 32`、`minimal 11 -> 11`、`cordis 32 -> 31`，四条都带 `~ compaction-basic.config.auto = false`。
 
 ## 四、待你确认
 
@@ -213,5 +231,6 @@ DESIGN 已同步：§7.2 日志策略表、§8 仓库树、§10 发布清单、�
 
 | 步 | 内容 |
 |---|---|
-| 9 | （可选）`npm publish` 首发，之后 `dsh plugin add dsh-preset-rules` 即可安装 |
-| 10 | （0.2）`set()`/`disable()`、正则选择器、规则热更新、首次运行对话框 |
+| 9 | （可选）`npm publish` 0.2.0，之后 `dsh plugin add dsh-preset-rules` 即可装到别的机器 |
+| 10 | （剩余 0.2）对象/数组字面量、正则选择器、规则文件热更新、首次运行对话框 |
+| 11 | 观察下一次长会话：若 `compaction/start` 仍有无 `sourceCommandId` 的条目，说明本机规则没生效，要查 patch watcher 是否重组了预设 |

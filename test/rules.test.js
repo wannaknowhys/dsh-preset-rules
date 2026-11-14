@@ -53,7 +53,7 @@ test('selector supports negation, union and difference', () => {
   });
 });
 
-test('reserved actions parse for forward compatibility', () => {
+test('set and the row-flag actions parse into their IR', () => {
   const rule = one('presets = all; entry = id: agent-instructions; action = set(config.maxBytes, 512)');
   assert.deepEqual(rule.action, { kind: 'set', path: ['config', 'maxBytes'], value: 512 });
   assert.equal(one('presets = all; entry = *; action = disable()').action.kind, 'disable');

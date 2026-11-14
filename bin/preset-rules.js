@@ -116,6 +116,7 @@ function toJson(result) {
         before: item.originalRows.length,
         after: item.rows.length,
         hidden: item.hidden,
+        applied: item.applied ?? [],
         changed: item.changed,
       })),
       diagnostics: result.diagnostics ?? [],

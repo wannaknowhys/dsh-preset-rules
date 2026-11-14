@@ -147,19 +147,19 @@ entry = id: {time-context, tool-todo}
 
 ### 3.5 子句 `action`：动作
 
-v0.1 **只实现 `hide()`**。其余动作在 v0.1 里**能被解析**，但执行时报「0.2 起支持」并整体中止（保留旧生成物），以免语法通过却静默无效。
+v0.2.0 实现全部四个动作。
 
-| 动作 | v0.1 | 语义 |
-|---|---|---|
-| `hide()` | ✅ | 从该 preset 的行列表中删除该行（不是卸载插件，不影响其他 preset） |
-| `disable()` / `enable()` | ⛔ 0.2 | 写整行的 `disabled: true/false` |
-| `set(path, literal)` | ⛔ 0.2 | 写某个字段，如 `set(config.maxBytes, 512)` |
+| 动作 | 语义 |
+|---|---|
+| `hide()` | 从该 preset 的行列表中删除该行（不是卸载插件，不影响其他 preset） |
+| `disable()` / `enable()` | 写整行的 `disabled: true/false` |
+| `set(path, literal)` | 写某个字段，如 `set(config.maxBytes, 512)` |
 
-`path` 语法（0.2）：根必须是 `config` 或 `disabled`；`config` 后接点分标识符。
+`path` 语法：根必须是 `config` 或 `disabled`；`config` 后接点分标识符，缺失的中间层按映射创建。`config.id` 与 `config.plugins` 归生成器所有，规则不能改写（会报错并中止）。字面量只支持 number / boolean / null / string；对象与数组字面量仍留到后续版本。
 
 命名说明：动作原名草案 `delete()`，现已定为 `hide()`（更准确）。为防误用，`delete()` 会给出 `unknown action "delete" (did you mean hide?)`。
 
-### 3.6 完整文法（v0.1）
+### 3.6 完整文法（v0.2）
 
 ```ebnf
 document := (line)*
@@ -193,7 +193,7 @@ literal  := number | "true" | "false" | "null" | string
 <file>:<line>:<col>: <severity>: <message>
 ```
 
-- **error**（中止本次生成、保留旧文件）：语法错误、未知子句、重复子句、缺少子句、未知动作、v0.1 未实现的动作、未知字段、非法字面量。
+- **error**（中止本次生成、保留旧文件）：语法错误、未知子句、重复子句、缺少子句、未知动作、本版本未实现的动作、未知字段、非法字面量、生成器保留的 `set` 路径（`config.id` / `config.plugins`）、`set(disabled, …)` 的非布尔值。
 - **warning**（继续）：未知 preset id、整条规则在所有被选 preset 中零匹配、空集合求值结果。
 - 未知动作/未知 preset 带就近建议：`unknown preset "minimial" (found: minimal, standard, cordis, ptc)`。
 - 诊断随生成结果写日志；`check` 模式打印到 stdout。
@@ -205,7 +205,10 @@ literal  := number | "true" | "false" | "null" | string
 # 把时间采样从所有预设里去掉（Creator 也用 cordis，所以全去）
 presets = all;                 entry = id: time-context;       action = hide()
 
-# 以后可用（0.2）：
+# 关掉所有预设的自动上下文压缩（那一行仍挂载，手动 /compact 照常可用）
+presets = all;                 entry = id: compaction-basic;    action = set(config.auto, false)
+
+# 改写某个字段也一样，行留在原位：
 # presets = not(minimal);      entry = id: agent-instructions; action = set(config.maxBytes, 512)
 ```
 
@@ -485,7 +488,7 @@ dsh-preset-rules/
 | 3 | 默认 mode | 发布版 `apply`；README 首装建议先 `check` |
 | 4 | 子句分隔 | `;`，三具名子句顺序无关 |
 | 5 | 隐藏动作命名 | `hide()`（`delete()` 仅作为错误提示的建议） |
-| 6 | v0.1 动作范围 | 只实现 `hide()`；`disable/enable/set` 可解析但报「0.2 起支持」 |
+| 6 | 动作范围 | v0.2.0 起四个动作全部实现；`set` 只收标量字面量（对象/数组留待后续） |
 | 7 | 规则文件缺失 | 视为无规则；已有生成物则清空为 `[]` |
 | 8 | 生成物归属 | 首行 header 判定；非本插件文件拒绝覆盖 |
 | 9 | 规则文件路径 | `$DSH_HOME/preset-rules.rules`（`.rules` 扩展名） |
@@ -515,7 +518,7 @@ dsh-preset-rules/
 | 版本 | 内容 |
 |---|---|
 | 0.1.0 | `hide()` + 三子句 DSL + check/apply + 原子写 + 校验 + 测试与文档 |
-| 0.2.0 | `set()`（含对象/数组字面量）、`disable()/enable()`、正则选择器、监听规则文件热更新、**首次运行对话框**（Web UI：空白 / 复制去 time-context 的默认 / 取消） |
+| 0.2.0 | 已发布：`set()`（标量字面量）、`disable()/enable()`、生成后回读校验。待做：对象/数组字面量、正则选择器、规则文件热更新、首次运行对话框 |
 | 0.3.0 | 自定义 preset（profile/bundle 声明）纳入规则域；多 profile 目标策略 |
 
 ---

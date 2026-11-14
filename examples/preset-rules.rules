@@ -21,5 +21,12 @@ presets = all; entry = id: time-context; action = hide()
 # Everything except the shell tools.
 # presets = all; entry = not(id: {tool-bash, tool-pwsh}); action = hide()
 
-# Reserved actions parse today but stop with "not supported in 0.1":
+# Rewrite one config field of a shipped row (the row stays where it is):
 # presets = not(minimal); entry = id: agent-instructions; action = set(config.maxBytes, 512)
+#
+# Stop the automatic context compaction in every preset (the plugin row keeps
+# running, so the manual /compact command still works):
+# presets = all; entry = id: compaction-basic; action = set(config.auto, false)
+#
+# Flip a row's disabled switch instead of removing it:
+# presets = {standard, cordis}; entry = id: tool-todo; action = disable()

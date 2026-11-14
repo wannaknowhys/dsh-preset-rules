@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { parseRules } from './rules.js';
-import { applyRules } from './model.js';
+import { applyRules, countRows, deepEqual, walkRows } from './model.js';
 import { loadSourcePresets } from './source.js';
 import { GENERATED_MARKER, hashText, isGenerated, renderPatch } from './render.js';
 import { loadEntryList } from './yaml.js';
@@ -25,6 +25,12 @@ export class GenerateError extends Error {
     this.name = 'GenerateError';
   }
 }
+
+/** Generator identity written into the generated header; the manifest is the source. */
+const GENERATOR = {
+  name: 'dsh-preset-rules',
+  version: JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version,
+};
 
 const MODES = new Set(['apply', 'check', 'off']);
 
@@ -57,6 +63,35 @@ function writeAtomic(targetPath, text) {
     }
     throw new GenerateError(`cannot write ${targetPath}: ${error.message}`, { cause: error });
   }
+}
+
+/**
+ * Read one dotted path out of a parsed row.
+ * @param {unknown} source parsed row
+ * @param {Array<string>} segments path segments including the root
+ * @returns {unknown} the value, or undefined when the path is absent
+ */
+function readPath(source, segments) {
+  let value = source;
+  for (const key of segments) {
+    if (value === null || typeof value !== 'object') return undefined;
+    value = value[key];
+  }
+  return value;
+}
+
+/**
+ * Find one row of a parsed preset entry by id, group children included.
+ * @param {object} entry parsed agent-preset row
+ * @param {string} id row id
+ * @returns {object | undefined} the row
+ */
+function findRow(entry, id) {
+  let found;
+  walkRows(entry, (row) => {
+    if (found === undefined && row.id === id) found = row;
+  });
+  return found;
 }
 
 /**
@@ -94,9 +129,34 @@ export function validateRendered(text, results, file = 'generated') {
         `${file}: preset "${result.presetId}" rendered ${plugins.length} rows, expected ${result.rows.length}`,
       );
     }
+    if (result.count !== undefined && countRows(entry) !== result.count) {
+      throw new GenerateError(
+        `${file}: preset "${result.presetId}" rendered ${countRows(entry)} rows in total, expected ${result.count}`,
+      );
+    }
     for (const hidden of result.hidden) {
-      if (plugins.some((row) => row?.id === hidden)) {
+      if (findRow(entry, hidden) !== undefined) {
         throw new GenerateError(`${file}: hidden row "${hidden}" survived in preset "${result.presetId}"`);
+      }
+    }
+    for (const change of result.applied ?? []) {
+      const rendered = findRow(entry, change.id);
+      if (!rendered) {
+        throw new GenerateError(`${file}: row "${change.id}" is missing from preset "${result.presetId}"`);
+      }
+      if (change.kind === 'set') {
+        const actual = readPath(rendered, change.path.split('.'));
+        if (!deepEqual(actual, change.value)) {
+          throw new GenerateError(
+            `${file}: preset "${result.presetId}" row "${change.id}" rendered ${change.path} as `
+            + `${JSON.stringify(actual)}, expected ${JSON.stringify(change.value)}`,
+          );
+        }
+      } else if (rendered.disabled !== (change.kind === 'disable')) {
+        throw new GenerateError(
+          `${file}: preset "${result.presetId}" row "${change.id}" did not keep `
+          + `disabled=${String(change.kind === 'disable')}`,
+        );
       }
     }
   }
@@ -123,7 +183,7 @@ export function generate(options = {}) {
     targetPath,
     webAppDir,
     execPath,
-    generator = { name: 'dsh-preset-rules', version: '0.1.0' },
+    generator = GENERATOR,
   } = options;
   const mode = options.mode ?? 'apply';
 

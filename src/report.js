@@ -13,6 +13,14 @@ function countLabel(changed) {
   return `${changed} ${changed === 1 ? 'entry' : 'entries'}`;
 }
 
+/** Render one applied rewrite, e.g. `~ compaction-basic.config.auto = false`. */
+function changeLabel(change) {
+  if (change.kind === 'set') {
+    return `~ ${change.id}.${change.path} = ${JSON.stringify(change.value)}`;
+  }
+  return `~ ${change.id} ${change.kind === 'disable' ? 'disabled' : 'enabled'}`;
+}
+
 function header(action) {
   if (action === 'off') return 'preset-rules: off';
   if (action === 'would-write') return 'preset-rules: check (no write)';
@@ -22,9 +30,15 @@ function header(action) {
 
 function summaryLine(result) {
   const label = result.presetId.padEnd(9);
-  if (!result.changed) return `  ${label}: ${result.originalRows.length} rows, unchanged`;
-  const hidden = result.hidden.length > 0 ? `   (- ${result.hidden.join(', ')})` : '';
-  return `  ${label}: ${result.originalRows.length} -> ${result.rows.length}${hidden}`;
+  const before = result.originalCount ?? result.originalRows.length;
+  const after = result.count ?? result.rows.length;
+  if (!result.changed) return `  ${label}: ${before} rows, unchanged`;
+  const parts = [];
+  if (result.hidden.length > 0) parts.push(`- ${result.hidden.join(', ')}`);
+  const applied = result.applied ?? [];
+  if (applied.length > 0) parts.push(applied.map(changeLabel).join(', '));
+  const detail = parts.length > 0 ? `   (${parts.join('; ')})` : '';
+  return `  ${label}: ${before} -> ${after}${detail}`;
 }
 
 /** One-line outcome, used by the plugin log and the report footer. */
