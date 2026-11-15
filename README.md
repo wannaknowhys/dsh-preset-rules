@@ -78,7 +78,13 @@ presets = {standard, cordis}; entry = not(id: persona); action = hide()
 presets = all; entry = id: compaction-basic; action = set(config.auto, false)
 ```
 
-`set(path, value)` rewrites one field of a matching row and keeps the row where it is. The path root is `config` (a dotted field path below it, created when absent) or `disabled` (a boolean for the whole row). Values are numbers, `true` / `false` / `null`, or quoted strings; object and array literals are not supported yet. `hide()` removes the row, so it is absorbing: later rules never see it.
+`set(path, value)` rewrites one field of a matching row and keeps the row where it is. The path root is `config` (a dotted field path below it, created when absent), `disabled` (a boolean for the whole row), or `name` (the package that mounts in that row, for swapping an implementation). Values are numbers, `true` / `false` / `null`, or quoted strings; object and array literals are not supported yet. `hide()` removes the row, so it is absorbing: later rules never see it.
+
+Swapping one engine for a drop-in replacement is a single row rewrite:
+
+```
+presets = all; entry = id: compaction-basic; action = set(name, "dsh-compaction-full-context")
+```
 
 Diagnostics carry `file:line:column`. An unknown preset or a rule that matches nothing is a warning; a syntax error, an unknown action, or a path the generator owns stops the run and leaves the previous file untouched.
 

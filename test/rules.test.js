@@ -57,6 +57,25 @@ test('set and the row-flag actions parse into their IR', () => {
   const rule = one('presets = all; entry = id: agent-instructions; action = set(config.maxBytes, 512)');
   assert.deepEqual(rule.action, { kind: 'set', path: ['config', 'maxBytes'], value: 512 });
   assert.equal(one('presets = all; entry = *; action = disable()').action.kind, 'disable');
+  assert.deepEqual(
+    one('presets = all; entry = id: compaction-basic; action = set(name, "other-engine")').action,
+    { kind: 'set', path: ['name'], value: 'other-engine' },
+  );
+});
+
+test('terminal path roots take no sub-path', () => {
+  assert.throws(
+    () => one('presets = all; entry = *; action = set(name.sub, "x")'),
+    (error) => /"name" takes no sub-path/.test(error.message),
+  );
+  assert.throws(
+    () => one('presets = all; entry = *; action = set(disabled.sub, true)'),
+    (error) => /"disabled" takes no sub-path/.test(error.message),
+  );
+  assert.throws(
+    () => one('presets = all; entry = *; action = set(plugin, "x")'),
+    (error) => /unsupported path root "plugin"/.test(error.message),
+  );
 });
 
 test('literals cover numbers, strings and booleans', () => {

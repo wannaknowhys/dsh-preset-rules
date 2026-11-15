@@ -47,6 +47,7 @@ export function countRows(presetRow) {
 
 /**
  * Write one action onto a row, creating the config object when the row has none.
+ * `disabled` and `name` are whole-row fields; `config` takes a dotted field path.
  * @param {object} row plugin entry, mutated in place
  * @param {Array<string>} segments path segments from `parsePath`
  * @param {unknown} value literal value for `set`
@@ -57,6 +58,13 @@ function writeSet(row, segments, value) {
   if (root === 'disabled') {
     if (typeof value !== 'boolean') throw new Error('set(disabled, …) needs true or false');
     row.disabled = value;
+    return;
+  }
+  if (root === 'name') {
+    if (typeof value !== 'string' || value.trim() === '') {
+      throw new Error('set(name, …) needs a non-empty package name, for example set(name, "my-engine")');
+    }
+    row.name = value;
     return;
   }
   if (rest.length === 0) {

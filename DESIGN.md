@@ -155,7 +155,7 @@ v0.2.0 实现全部四个动作。
 | `disable()` / `enable()` | 写整行的 `disabled: true/false` |
 | `set(path, literal)` | 写某个字段，如 `set(config.maxBytes, 512)` |
 
-`path` 语法：根必须是 `config` 或 `disabled`；`config` 后接点分标识符，缺失的中间层按映射创建。`config.id` 与 `config.plugins` 归生成器所有，规则不能改写（会报错并中止）。字面量只支持 number / boolean / null / string；对象与数组字面量仍留到后续版本。
+`path` 语法：根是 `config`、`disabled` 或 `name`；`config` 后接点分标识符，缺失的中间层按映射创建；`disabled` 收布尔；`name` 收非空字符串（整行的包名，用来换实现）。`config.id` 与 `config.plugins` 归生成器所有，规则不能改写（会报错并中止）。字面量只支持 number / boolean / null / string；对象与数组字面量仍留到后续版本。
 
 命名说明：动作原名草案 `delete()`，现已定为 `hide()`（更准确）。为防误用，`delete()` 会给出 `unknown action "delete" (did you mean hide?)`。
 
@@ -181,7 +181,7 @@ action   := "hide" ws "(" ws ")"
           | "disable" ws "(" ws ")"
           | "enable" ws "(" ws ")"
           | "set" ws "(" ws path ws "," ws literal ws ")"
-path     := ("config" | "disabled") ("." ident)*
+path     := ("config" ("." ident)*) | "disabled" | "name"
 literal  := number | "true" | "false" | "null" | string
 ```
 
@@ -208,7 +208,10 @@ presets = all;                 entry = id: time-context;       action = hide()
 # 关掉所有预设的自动上下文压缩（那一行仍挂载，手动 /compact 照常可用）
 presets = all;                 entry = id: compaction-basic;    action = set(config.auto, false)
 
-# 改写某个字段也一样，行留在原位：
+# 换掉压缩引擎（需要先安装 dsh-compaction-full-context），行仍在原位：
+presets = all;                 entry = id: compaction-basic;    action = set(name, "dsh-compaction-full-context")
+
+# 改写某个字段也一样：
 # presets = not(minimal);      entry = id: agent-instructions; action = set(config.maxBytes, 512)
 ```
 

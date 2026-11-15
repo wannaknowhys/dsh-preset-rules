@@ -204,6 +204,35 @@ test('setting a value the row already has counts as unchanged', () => {
   assert.equal(results[0].changed, false);
 });
 
+test('set(name, …) swaps the plugin package of a matched row', () => {
+  const presets = [
+    preset('standard', 1, [
+      { id: 'compaction-basic', name: '@deepseek-ai/dsh-compaction-basic', config: { auto: false } },
+    ]),
+  ];
+  const { results } = run(
+    'presets = all; entry = id: compaction-basic; action = set(name, "dsh-compaction-full-context")',
+    presets,
+  );
+  assert.equal(results[0].rows[0].name, 'dsh-compaction-full-context');
+  assert.deepEqual(results[0].rows[0].config, { auto: false }, 'the rest of the row survives');
+  assert.deepEqual(results[0].applied, [
+    { id: 'compaction-basic', kind: 'set', path: 'name', value: 'dsh-compaction-full-context' },
+  ]);
+  assert.equal(presets[0].row.config.plugins[0].name, '@deepseek-ai/dsh-compaction-basic');
+});
+
+test('set(name, …) rejects a non-string or empty value', () => {
+  assert.throws(
+    () => run('presets = all; entry = id: persona; action = set(name, "")'),
+    (error) => /non-empty package name/.test(error.message) && error.line === 1,
+  );
+  assert.throws(
+    () => run('presets = all; entry = id: persona; action = set(name, 7)'),
+    (error) => /non-empty package name/.test(error.message),
+  );
+});
+
 test('an ungovernable set path fails with the rule position', () => {
   assert.throws(
     () => run('presets = all; entry = id: persona; action = set(config.id, "other")'),

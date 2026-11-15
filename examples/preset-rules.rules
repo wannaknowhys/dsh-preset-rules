@@ -28,5 +28,8 @@ presets = all; entry = id: time-context; action = hide()
 # running, so the manual /compact command still works):
 # presets = all; entry = id: compaction-basic; action = set(config.auto, false)
 #
+# Swap the compaction engine for a drop-in replacement (install that bundle first):
+# presets = all; entry = id: compaction-basic; action = set(name, "dsh-compaction-full-context")
+#
 # Flip a row's disabled switch instead of removing it:
 # presets = {standard, cordis}; entry = id: tool-todo; action = disable()

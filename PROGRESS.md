@@ -192,6 +192,13 @@ cd ..\dump-manager; npm publish
 - `--check` → `--apply` 通过，`$DSH_HOME/cordis.patch.yml` 四个预设的 compaction group 内均有 `config: { auto: false }`。
 - **未验证**：运行中的进程是否需要重启才让新修订生效（patch watcher 会重组合，但已开始的会话保持旧修订），因此本会话仍可能自动压缩一次；下次长会话的 `compaction/start` 是否全部带 `sourceCommandId`，是这条规则是否生效的可证伪检查。
 
+### 阶段十五 — 0.2.1：`set(name, …)` 与压缩引擎替换（+3 用例 → 91 通过）
+
+- `set` 新增终端根 `name`：整行的包名，用于把某个位置上的实现换掉（`parsePath` 拒绝子路径，`writeSet` 要求非空字符串）。
+- 首个用途：`presets = all; entry = id: compaction-basic; action = set(name, "dsh-compaction-full-context")`，把官方压缩引擎换成「摘要器读全上下文」的子类（见 `packages/compaction-full-context`）。
+- 保留 `set(config.auto, false)`：两条规则叠加后，自动压缩关闭、手动 `/compact` 仍可用，且它的摘要现在覆盖到最后一条回复。
+- 生成物验证：四个预设的 compaction group 里 `name: dsh-compaction-full-context`、`config.auto: false` 同时存在；第二次 `--check` 为 `unchanged`。
+
 ## 二、与 DESIGN 的偏离
 
 | # | 阶段 | DESIGN | 实际 | 原因 |

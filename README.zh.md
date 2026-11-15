@@ -78,7 +78,13 @@ presets = {standard, cordis}; entry = not(id: persona); action = hide()
 presets = all; entry = id: compaction-basic; action = set(config.auto, false)
 ```
 
-`set(path, value)` 改写匹配行上的一个字段，行本身留在原位。路径根是 `config`（下面接点分字段，不存在时自动创建）或 `disabled`（整行布尔值）。值只支持数字、`true` / `false` / `null` 和带引号的字符串；对象、数组字面量暂不支持。`hide()` 会删掉整行，因此是「吸收」的：后续规则看不到它。
+`set(path, value)` 改写匹配行上的一个字段，行本身留在原位。路径根是 `config`（下面接点分字段，不存在时自动创建）、`disabled`（整行布尔值）或 `name`（该行挂载的包名，用来换实现）。值只支持数字、`true` / `false` / `null` 和带引号的字符串；对象、数组字面量暂不支持。`hide()` 会删掉整行，因此是「吸收」的：后续规则看不到它。
+
+换掉某个引擎（用一个可直接替换的实现）就是改写一行：
+
+```
+presets = all; entry = id: compaction-basic; action = set(name, "dsh-compaction-full-context")
+```
 
 诊断信息带 `文件:行:列`。未知 preset、规则一处都没匹配到是警告；语法错误、未知动作、尝试改写生成器自己拥有的路径会中止本次生成并保留旧文件。
 

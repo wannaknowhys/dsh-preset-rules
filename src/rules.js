@@ -326,14 +326,21 @@ function parseSelectorExpr(cursor) {
   return left;
 }
 
+/** Path roots that take no sub-path; `config` is the only one with fields below it. */
+const TERMINAL_ROOTS = new Set(['disabled', 'name'])
+
 function parsePath(token, line) {
   const segments = token.value.split('.');
   const root = segments[0];
-  if (root !== 'config' && root !== 'disabled') {
-    throw new RuleError(`unsupported path root "${root}" (expected config or disabled)`, line, token.col);
+  if (root !== 'config' && !TERMINAL_ROOTS.has(root)) {
+    throw new RuleError(
+      `unsupported path root "${root}" (expected config, disabled, or name)`,
+      line,
+      token.col,
+    );
   }
-  if (root === 'disabled' && segments.length > 1) {
-    throw new RuleError('"disabled" takes no sub-path', line, token.col);
+  if (root !== 'config' && segments.length > 1) {
+    throw new RuleError(`"${root}" takes no sub-path`, line, token.col);
   }
   return segments;
 }
